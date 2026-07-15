@@ -44,12 +44,12 @@ export function Navbar() {
         left: 0,
         right: 0,
         zIndex: 50,
-        background: 'linear-gradient(180deg, var(--bg) 0%, rgba(15,20,25,0.8) 100%)',
+        background: 'var(--nav-bg)',
         backdropFilter: 'blur(12px)',
         borderBottom: '1px solid var(--border)',
       }}
     >
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
         {/* Logo */}
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
           <div
@@ -69,7 +69,7 @@ export function Navbar() {
           >
             Q
           </div>
-          <span style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-1)' }}>Queue</span>
+              <span style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-1)' }}>Queuely</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -79,6 +79,7 @@ export function Navbar() {
             gap: '28px',
             alignItems: 'center',
           }}
+          className="nav-desktop-links"
         >
           <Link href="/" style={linkStyle as any} onMouseEnter={(e: any) => (e.currentTarget.style.color = 'var(--accent)')} onMouseLeave={(e: any) => (e.currentTarget.style.color = 'var(--text-2)')}>
             {nav.home}
@@ -145,8 +146,44 @@ export function Navbar() {
               {nav.business}
             </Link>
           </motion.div>
+
+          <motion.button
+            type="button"
+            onClick={() => setShowMobileMenu((value) => !value)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            style={{
+              display: 'none',
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: '10px',
+              padding: '9px 12px',
+              color: 'var(--text-1)',
+              fontSize: '14px',
+              fontWeight: '700',
+            }}
+            className="nav-mobile-toggle"
+          >
+            ☰
+          </motion.button>
         </div>
       </div>
+
+      {showMobileMenu && (
+        <div className="nav-mobile-panel" style={{ display: 'block', borderTop: '1px solid var(--border)', background: 'var(--nav-bg)', backdropFilter: 'blur(12px)' }}>
+          <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '14px 24px 18px', display: 'grid', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px' }}>
+              <Link href="/" style={{ textDecoration: 'none', color: 'var(--text-1)', border: '1px solid var(--border)', borderRadius: '12px', padding: '12px 14px', background: 'var(--surface)' }}>{nav.home}</Link>
+              <Link href="/discover" style={{ textDecoration: 'none', color: 'var(--text-1)', border: '1px solid var(--border)', borderRadius: '12px', padding: '12px 14px', background: 'var(--surface)' }}>{nav.discover}</Link>
+              <Link href="/business/login" style={{ textDecoration: 'none', color: 'white', borderRadius: '12px', padding: '12px 14px', background: 'linear-gradient(135deg, var(--accent), var(--accent-2))' }}>{nav.business}</Link>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+              <Link href="/join" style={{ textDecoration: 'none', color: 'var(--text-1)', border: '1px solid var(--border)', borderRadius: '999px', padding: '10px 14px', background: 'var(--surface)' }}>Join queue</Link>
+              <Link href="/business/dashboard" style={{ textDecoration: 'none', color: 'var(--text-1)', border: '1px solid var(--border)', borderRadius: '999px', padding: '10px 14px', background: 'var(--surface)' }}>Dashboard</Link>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.nav>
   )
 }

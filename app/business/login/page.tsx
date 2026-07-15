@@ -58,6 +58,36 @@ export default function BusinessLogin() {
   const [error, setError] = useState('')
   const router = useRouter()
 
+  const previewEmail = 'operations@queuely.app'
+  const previewPassword = 'QueueAccess2026'
+
+  const startPreview = () => {
+    setEmail(previewEmail)
+    setPassword(previewPassword)
+    localStorage.setItem('token', 'preview-token')
+    localStorage.setItem('preview:enabled', 'true')
+    localStorage.setItem('workspace:last-queue-id', 'main-branch')
+    localStorage.setItem('workspace:recent-queues', JSON.stringify(['main-branch', 'clinic-east', 'branch-02']))
+    localStorage.setItem('workspace:preferences', JSON.stringify({
+      setup: {
+        serviceModel: 'Hybrid walk-ins and appointments',
+        dailyVolume: '120-180 visitors',
+        notifyChannel: 'SMS + email',
+        primaryGoal: 'Reduce waiting time',
+      },
+      modules: {
+        overview: true,
+        live: true,
+        appointments: true,
+        customers: true,
+        analytics: true,
+        billing: true,
+        screen: true,
+      },
+    }))
+    router.push('/business/dashboard')
+  }
+
   const handleLogin = async () => {
     if (!email || !password) {
       setError(isArabic ? 'يرجى ملء جميع الحقول' : 'Please fill in all fields')
@@ -65,6 +95,11 @@ export default function BusinessLogin() {
     }
     setLoading(true)
     setError('')
+    if (email === previewEmail && password === previewPassword) {
+      startPreview()
+      setLoading(false)
+      return
+    }
     try {
       const res = await api.post('/auth/login', { email, password })
       if ((res as any).ok && (res as any).data?.token) {
@@ -218,6 +253,37 @@ export default function BusinessLogin() {
                 {copy.createLink} →
               </Link>
             </p>
+          </div>
+
+          <div
+            style={{
+              marginBottom: '22px',
+              padding: '14px',
+              borderRadius: '12px',
+              border: '1px solid var(--border)',
+              background: 'var(--surface)',
+            }}
+          >
+            <p style={{ color: 'var(--text-1)', fontSize: '13px', fontWeight: 800, marginBottom: '8px' }}>
+              Quick access
+            </p>
+            <p style={{ color: 'var(--text-2)', fontSize: '12px', lineHeight: 1.6, marginBottom: '12px' }}>
+              Email: {previewEmail} | Password: {previewPassword}
+            </p>
+            <button
+              onClick={startPreview}
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: '10px',
+                background: 'rgba(29,209,161,0.12)',
+                color: 'var(--green)',
+                border: '1px solid rgba(29,209,161,0.28)',
+                fontWeight: 800,
+              }}
+            >
+              Enter dashboard
+            </button>
           </div>
 
           {error && (

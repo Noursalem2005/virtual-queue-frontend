@@ -9,7 +9,7 @@ import { useAtom } from 'jotai';
 import { eventStoreAtom, commandHistoryAtom } from '@/lib/atoms';
 
 export type Command = 
-  | { type: 'SERVE_TICKET'; ticketId: string; staffId: string }
+  | { type: 'SERVE_TICKET'; queueId?: string; ticketId?: string; staffId?: string }
   | { type: 'PAUSE_QUEUE'; queueId: string; reason: string }
   | { type: 'PRIORITY_TICKET'; ticketId: string; priority: 1 | 2 | 3 }
   | { type: 'NO_SHOW'; ticketId: string }
@@ -18,7 +18,8 @@ export type Command =
   | { type: 'CHANGE_PASSWORD'; oldPassword: string; newPassword: string }
   | { type: 'ENABLE_2FA'; method: 'email' | 'sms' | 'totp' }
   | { type: 'LOAD_TEMPLATE'; templateId: string }
-  | { type: 'NAVIGATE_VIEW'; view: string };
+  | { type: 'NAVIGATE_VIEW'; view: string }
+  | { type: 'AI_ACTION' };
 
 export const useCommandBus = () => {
   const [eventStore, setEventStore] = useAtom(eventStoreAtom);
@@ -60,6 +61,7 @@ async function handleCommand(cmd: Command) {
   // Handlers execute actual API calls / state updates
   switch (cmd.type) {
     case 'SERVE_TICKET':
+      if (!cmd.queueId || !cmd.ticketId) return;
       await fetch(`/api/queues/${cmd.queueId}/serve`, {
         method: 'PATCH',
         body: JSON.stringify({ ticketId: cmd.ticketId, staffId: cmd.staffId }),

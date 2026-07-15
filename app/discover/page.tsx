@@ -17,7 +17,7 @@ interface Queue {
   description: string
 }
 
-const CATEGORIES = isArabic => isArabic
+const CATEGORIES = (isArabic: boolean) => isArabic
   ? [
       { value: 'all', label: '📌 الكل', emoji: '📌' },
       { value: 'bank', label: '🏦 بنك', emoji: '🏦' },

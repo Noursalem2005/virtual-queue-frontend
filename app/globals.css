@@ -8,6 +8,8 @@
   --bg: #0f1419;
   --bg-2: #1a1f2e;
   --bg-3: #252d3d;
+  --surface: rgba(255,255,255,0.04);
+  --surface-strong: rgba(255,255,255,0.08);
   --border: rgba(255,255,255,0.06);
   --border-hover: rgba(255,255,255,0.12);
   --text-1: #f5f5f7;
@@ -22,6 +24,8 @@
   --blue-glow: rgba(59,130,246,0.12);
   --red: #ff6b6b;
   --orange: #ffa500;
+  --nav-bg: rgba(15,20,25,0.82);
+  --shadow-soft: 0 24px 80px rgba(0,0,0,0.28);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -84,6 +88,8 @@ body {
   --bg: #fafbfc;
   --bg-2: #f0f2f5;
   --bg-3: #e5e7eb;
+  --surface: rgba(255,255,255,0.82);
+  --surface-strong: rgba(255,255,255,0.96);
   --border: rgba(0,0,0,0.08);
   --border-hover: rgba(0,0,0,0.14);
   --text-1: #111827;
@@ -94,6 +100,8 @@ body {
   --accent-glow: rgba(91,109,255,0.1);
   --green: #059669;
   --green-glow: rgba(5,150,105,0.1);
+  --nav-bg: rgba(250,251,252,0.86);
+  --shadow-soft: 0 24px 70px rgba(17,24,39,0.12);
 }
 
 .light .glass { background: rgba(255,255,255,0.85); border: 1px solid var(--border); }
@@ -160,10 +168,455 @@ button:active {
 .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; background: var(--accent-glow); color: var(--accent); }
 .container-custom { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
+.home-shell {
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 11%, transparent), transparent 34%),
+    linear-gradient(225deg, color-mix(in srgb, var(--green) 10%, transparent), transparent 30%),
+    var(--bg);
+  color: var(--text-1);
+  padding: 96px 24px 48px;
+}
+
+.hero-showcase,
+.feature-band,
+.workflow-grid {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.hero-showcase {
+  min-height: calc(100vh - 112px);
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+  gap: 28px;
+  align-items: center;
+}
+
+.hero-copy h1 {
+  font-size: clamp(56px, 9vw, 116px);
+  line-height: 0.9;
+  font-weight: 900;
+  letter-spacing: 0;
+  color: var(--text-1);
+  margin: 14px 0 22px;
+}
+
+.hero-copy p,
+.module-card p,
+.workflow-panel p {
+  color: var(--text-2);
+  line-height: 1.7;
+}
+
+.hero-copy p {
+  max-width: 590px;
+  font-size: 18px;
+}
+
+.eyebrow,
+.mini-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-2);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.credential-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 20px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 13px;
+}
+
+.credential-strip strong {
+  color: var(--text-1);
+  font-weight: 800;
+}
+
+.product-frame,
+.module-card,
+.workflow-panel {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.product-frame {
+  border-radius: 8px;
+  padding: 18px;
+  backdrop-filter: blur(18px);
+}
+
+.dashboard-topbar,
+.queue-preview,
+.analytics-card {
+  display: flex;
+  gap: 16px;
+}
+
+.dashboard-topbar {
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dashboard-topbar h2,
+.section-heading h2,
+.workflow-panel h2 {
+  color: var(--text-1);
+  font-size: clamp(22px, 3vw, 34px);
+  margin-top: 6px;
+}
+
+.live-pill {
+  border: 1px solid color-mix(in srgb, var(--green) 38%, transparent);
+  color: var(--green);
+  background: color-mix(in srgb, var(--green) 12%, transparent);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.metric-grid div,
+.customer-panel,
+.phone-mock,
+.appointment-list div {
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-2) 78%, transparent);
+  border-radius: 8px;
+}
+
+.metric-grid div {
+  padding: 14px;
+}
+
+.metric-grid span,
+.phone-ticket span,
+.appointment-list em {
+  display: block;
+  color: var(--text-3);
+  font-size: 12px;
+}
+
+.metric-grid strong {
+  display: block;
+  color: var(--text-1);
+  font-size: 28px;
+  margin-top: 8px;
+}
+
+.ticket-list {
+  display: grid;
+  gap: 10px;
+  flex: 1;
+}
+
+.ticket-row {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 10px;
+  min-height: 58px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-2) 72%, transparent);
+  color: var(--text-2);
+  text-align: left;
+}
+
+.ticket-row.active {
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-2));
+  color: var(--text-1);
+}
+
+@media (max-width: 1100px) {
+  .dashboard-shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  .dashboard-sidebar {
+    position: static !important;
+    top: auto !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-showcase {
+    grid-template-columns: 1fr !important;
+    min-height: auto;
+  }
+
+  .metric-grid,
+  .queue-preview,
+  .analytics-card,
+  .dashboard-topbar {
+    flex-direction: column;
+  }
+
+  .home-shell {
+    padding: 88px 18px 40px;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(44px, 14vw, 84px);
+  }
+}
+
+@media (max-width: 720px) {
+  .ticket-row {
+    grid-template-columns: 56px minmax(0, 1fr);
+  }
+
+  .ticket-row button:last-child {
+    grid-column: 1 / -1;
+    justify-self: flex-end;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .nav-desktop-links,
+  .nav-mobile-panel {
+    display: none !important;
+  }
+
+  .nav-mobile-toggle {
+    display: inline-flex !important;
+  }
+}
+
+@media (min-width: 721px) {
+  .nav-mobile-toggle,
+  .nav-mobile-panel {
+    display: none !important;
+  }
+}
+
+.ticket-row strong,
+.ticket-row em {
+  color: var(--accent-2);
+  font-style: normal;
+}
+
+.customer-panel {
+  width: 220px;
+  padding: 18px;
+  align-self: stretch;
+}
+
+.customer-panel h3 {
+  margin-top: 10px;
+  font-size: 24px;
+  color: var(--text-1);
+}
+
+.panel-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.panel-actions button,
+.phone-mock button {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent-2);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 12px;
+}
+
+.feature-band {
+  padding: 56px 0 24px;
+}
+
+.section-heading {
+  margin-bottom: 18px;
+}
+
+.module-grid,
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.module-card,
+.workflow-panel {
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.module-value {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--green));
+  color: white;
+  font-weight: 900;
+  margin-bottom: 18px;
+}
+
+.module-card h3 {
+  color: var(--text-1);
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.workflow-grid {
+  padding: 28px 0 48px;
+}
+
+.phone-mock {
+  margin-top: 18px;
+  padding: 14px;
+}
+
+.phone-ticket {
+  text-align: center;
+  padding: 22px;
+  border-radius: 8px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+}
+
+.phone-ticket strong {
+  display: block;
+  color: var(--accent-2);
+  font-size: 54px;
+  margin: 8px 0;
+}
+
+.phone-mock button {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.appointment-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.appointment-list div {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) 76px;
+  gap: 10px;
+  align-items: center;
+  padding: 14px;
+}
+
+.appointment-list strong {
+  color: var(--accent-2);
+}
+
+.analytics-card {
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--green) 9%, transparent);
+}
+
+.analytics-card strong {
+  display: block;
+  color: var(--green);
+  font-size: 42px;
+}
+
+.analytics-card span {
+  display: block;
+  color: var(--text-2);
+  max-width: 180px;
+}
+
 @media (max-width: 768px) {
   .glass { background: rgba(255,255,255,0.03); }
   .light .glass { background: rgba(255,255,255,0.75); }
   input, textarea, select { font-size: 16px; }
+}
+
+@media (max-width: 1020px) {
+  .hero-showcase,
+  .workflow-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .module-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .home-shell {
+    padding: 88px 14px 32px;
+  }
+
+  .hero-showcase {
+    min-height: auto;
+  }
+
+  .hero-copy h1 {
+    font-size: 56px;
+  }
+
+  .metric-grid,
+  .module-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .queue-preview,
+  .dashboard-topbar {
+    flex-direction: column;
+  }
+
+  .customer-panel {
+    width: 100%;
+  }
+
+  .appointment-list div {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  .appointment-list em {
+    grid-column: 2;
+  }
 }
 
 @media (max-width: 900px) {

@@ -32,6 +32,37 @@ const sidebarIcon: Record<View, string> = {
   screen: '📺',
 }
 
+const previewQueueState = {
+  queueId: 'main-branch',
+  waitingCount: 4,
+  averageWaitSeconds: 520,
+  estimatedWaitForNext: 180,
+  currentlyServing: {
+    id: 'preview-ticket-41',
+    queue_id: 'main-branch',
+    customer_name: 'Maya Hassan',
+    customer_phone: '+20 100 555 0141',
+    ticket_number: 41,
+    status: 'called' as const,
+    priority: false,
+    joined_at: new Date(),
+    updated_at: new Date(),
+  },
+  tickets: [
+    { id: 'preview-ticket-42', queue_id: 'main-branch', customer_name: 'Omar Nabil', customer_phone: '+20 100 555 0142', ticket_number: 42, status: 'waiting' as const, priority: false, joined_at: new Date(), updated_at: new Date() },
+    { id: 'preview-ticket-43', queue_id: 'main-branch', customer_name: 'Lina Adel', customer_phone: '+20 100 555 0143', ticket_number: 43, status: 'waiting' as const, priority: true, priority_reason: 'Accessibility support', joined_at: new Date(), updated_at: new Date() },
+    { id: 'preview-ticket-44', queue_id: 'main-branch', customer_name: 'Guest visitor', customer_phone: '+20 100 555 0144', ticket_number: 44, status: 'waiting' as const, priority: false, joined_at: new Date(), updated_at: new Date() },
+    { id: 'preview-ticket-45', queue_id: 'main-branch', customer_name: 'Nada Samir', customer_phone: '+20 100 555 0145', ticket_number: 45, status: 'waiting' as const, priority: false, joined_at: new Date(), updated_at: new Date() },
+  ],
+  appointments: [],
+}
+
+const previewAppointments = [
+  { id: 'preview-appointment-1', queueId: 'main-branch', customerName: 'Nada Samir', customerPhone: '+20 100 555 0145', scheduledAt: new Date(), durationMinutes: 20, status: 'arrived' as const, ticketNumber: 45 },
+  { id: 'preview-appointment-2', queueId: 'main-branch', customerName: 'Karim Fouad', customerPhone: '+20 100 555 0146', scheduledAt: new Date(Date.now() + 45 * 60 * 1000), durationMinutes: 15, status: 'scheduled' as const, ticketNumber: 46 },
+  { id: 'preview-appointment-3', queueId: 'main-branch', customerName: 'Salma Ali', customerPhone: '+20 100 555 0147', scheduledAt: new Date(Date.now() + 90 * 60 * 1000), durationMinutes: 15, status: 'scheduled' as const, ticketNumber: 47 },
+]
+
 export default function BusinessDashboard() {
   const { lang, dir } = useLang()
   const isArabic = lang === 'ar'
@@ -49,6 +80,7 @@ export default function BusinessDashboard() {
         customers: 'العملاء',
         analytics: 'التحليلات',
         billing: 'الفوترة',
+        refresh: 'تحديث البيانات',
         screen: 'الشاشة',
         overview: 'نظرة عامة',
         queueActive: 'الطابور نشط',
@@ -104,6 +136,7 @@ export default function BusinessDashboard() {
         customers: 'Customers',
         analytics: 'Analytics',
         billing: 'Billing',
+        refresh: 'Refresh data',
         screen: 'Screen',
         overview: 'Overview',
         queueActive: 'Queue active',
@@ -159,6 +192,7 @@ export default function BusinessDashboard() {
   const [rating, setRating] = useState<{ avg_rating: string; total_reviews: string } | null>(null)
   const [analytics, setAnalytics] = useState<number[]>([])
   const [loadError, setLoadError] = useState('')
+  const [previewMode, setPreviewMode] = useState(false)
   const { state, loading } = useQueue(activeQueueId)
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') || '' : ''
 
@@ -169,6 +203,11 @@ export default function BusinessDashboard() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+    const enabledPreview = localStorage.getItem('preview:enabled') === 'true' || localStorage.getItem('token') === 'preview-token'
+    setPreviewMode(enabledPreview)
+    if (enabledPreview && !localStorage.getItem('workspace:last-queue-id')) {
+      localStorage.setItem('workspace:last-queue-id', 'main-branch')
+    }
     const rawPrefs = localStorage.getItem('workspace:preferences')
     if (rawPrefs) {
       try {
@@ -178,7 +217,7 @@ export default function BusinessDashboard() {
       }
     }
 
-    const storedQueue = localStorage.getItem('workspace:last-queue-id')
+    const storedQueue = localStorage.getItem('workspace:last-queue-id') || (enabledPreview ? 'main-branch' : '')
     if (storedQueue) {
       setActiveQueueId(storedQueue)
       setQueueIdInput(storedQueue)
@@ -196,6 +235,10 @@ export default function BusinessDashboard() {
 
   useEffect(() => {
     if (!token) return
+    if (token === 'preview-token') {
+      setOwner({ email: 'operations@queuely.app', role: 'business' })
+      return
+    }
     const fetchMe = async () => {
       const me = await api.get('/auth/me', token)
       if (me.ok === false) return
@@ -208,6 +251,10 @@ export default function BusinessDashboard() {
   }, [token])
 
   const fetchAppointments = useCallback(async () => {
+    if (previewMode) {
+      setAppointments(previewAppointments)
+      return
+    }
     try {
       const data = await api.get(`/queues/${activeQueueId}/state`, token)
       if (data.ok === false) {
@@ -218,9 +265,13 @@ export default function BusinessDashboard() {
     } catch {
       setAppointments([])
     }
-  }, [activeQueueId, token])
+  }, [activeQueueId, previewMode, token])
 
   const fetchRating = useCallback(async () => {
+    if (previewMode) {
+      setRating({ avg_rating: '4.8', total_reviews: '126' })
+      return
+    }
     try {
       const data = await api.get(`/queues/${activeQueueId}/rating`, token)
       if (data.ok === false) {
@@ -231,9 +282,13 @@ export default function BusinessDashboard() {
     } catch {
       setRating(null)
     }
-  }, [activeQueueId, token])
+  }, [activeQueueId, previewMode, token])
 
   const fetchQR = useCallback(async () => {
+    if (previewMode) {
+      setJoinUrl(`${window.location.origin}/join/main-branch`)
+      return
+    }
     try {
       const data = await api.get(`/queues/${activeQueueId}/qr`, token)
       if (data.ok === false) {
@@ -244,9 +299,13 @@ export default function BusinessDashboard() {
     } catch {
       setJoinUrl('')
     }
-  }, [activeQueueId, token])
+  }, [activeQueueId, previewMode, token])
 
   const fetchAnalytics = useCallback(async () => {
+    if (previewMode) {
+      setAnalytics([8, 12, 10, 16, 14, 20, 18])
+      return
+    }
     try {
       const data = await api.get(`/queues/${activeQueueId}/weekly-stats`, token)
       if (data.ok === false) {
@@ -257,7 +316,7 @@ export default function BusinessDashboard() {
     } catch {
       setAnalytics([])
     }
-  }, [activeQueueId, token])
+  }, [activeQueueId, previewMode, token])
 
   useEffect(() => {
     if (!activeQueueId) return
@@ -298,6 +357,7 @@ export default function BusinessDashboard() {
   }
 
   const handlePause = async () => {
+    if (previewMode) return
     if (!activeQueueId) return
     const data = await api.patch(`/queues/${activeQueueId}/pause`, {}, token)
     if (data.ok === false) {
@@ -307,6 +367,7 @@ export default function BusinessDashboard() {
     await refreshQueueData()
   }
   const handleResume = async () => {
+    if (previewMode) return
     if (!activeQueueId) return
     const data = await api.patch(`/queues/${activeQueueId}/resume`, {}, token)
     if (data.ok === false) {
@@ -316,6 +377,7 @@ export default function BusinessDashboard() {
     await refreshQueueData()
   }
   const handleCallNext = async () => {
+    if (previewMode) return
     if (!activeQueueId) return
     const data = await api.post(`/queues/${activeQueueId}/call-next`, {}, token)
     if (data.ok === false) {
@@ -325,6 +387,7 @@ export default function BusinessDashboard() {
     await refreshQueueData()
   }
   const handleServe = async (ticketId: string) => {
+    if (previewMode) return
     const data = await api.patch(`/queues/tickets/${ticketId}/serve`, {}, token)
     if (data.ok === false) {
       setLoadError((data.error as string) || 'Failed to mark ticket as served')
@@ -333,6 +396,7 @@ export default function BusinessDashboard() {
     await refreshQueueData()
   }
   const handleResetCounter = async () => {
+    if (previewMode) return
     if (!activeQueueId) return
     const data = await api.post(`/queues/${activeQueueId}/reset-counter`, {}, token)
     if (data.ok === false) {
@@ -342,6 +406,7 @@ export default function BusinessDashboard() {
     await refreshQueueData()
   }
   const handleMarkNoShow = async () => {
+    if (previewMode) return
     if (!activeQueueId) return
     const data = await api.post(`/queues/${activeQueueId}/mark-no-show`, {}, token)
     if (data.ok === false) {
@@ -351,7 +416,8 @@ export default function BusinessDashboard() {
     await refreshQueueData()
   }
 
-  const queueTickets = (state?.tickets || [])
+  const displayState = previewMode ? previewQueueState : state
+  const queueTickets = (displayState?.tickets || [])
   const filteredTickets = queueTickets.filter((ticket) => {
     const haystack = [ticket.ticket_number, ticket.customer_name, ticket.customer_phone, ticket.priority_reason].filter(Boolean).join(' ').toLowerCase()
     return haystack.includes(search.toLowerCase())
@@ -362,7 +428,7 @@ export default function BusinessDashboard() {
   })
   const weeklySeries = analytics.length ? analytics : [4, 7, 6, 10, 8, 12, 9]
 
-  const sidebarItems: Array<{ id: View; label: string }> = [
+  const sidebarItems = [
     { id: 'overview', label: copy.overview },
     { id: 'live', label: copy.live },
     { id: 'appointments', label: copy.appointments },
@@ -370,7 +436,8 @@ export default function BusinessDashboard() {
     { id: 'analytics', label: copy.analytics },
     { id: 'billing', label: copy.billing },
     { id: 'screen', label: copy.screen },
-  ].filter((item) => getEnabled(item.id))
+  ] satisfies Array<{ id: View; label: string }>
+  const enabledSidebarItems = sidebarItems.filter((item) => getEnabled(item.id))
 
   const panelStyle: CSSProperties = {
     background: 'var(--bg-2)',
@@ -386,11 +453,25 @@ export default function BusinessDashboard() {
     boxShadow: '0 24px 80px rgba(0,0,0,0.12)',
   }
 
+  const topActions = [
+    { label: copy.callNext, action: handleCallNext, variant: 'primary' as const },
+    { label: copy.pause, action: handlePause, variant: 'ghost' as const },
+    { label: copy.resume, action: handleResume, variant: 'ghost' as const },
+    { label: copy.reset, action: handleResetCounter, variant: 'ghost' as const },
+    { label: copy.noshow, action: handleMarkNoShow, variant: 'ghost' as const },
+  ]
+
+  const utilityActions = [
+    { label: copy.openScreen, action: () => window.open(`/screen/${activeQueueId}`, '_blank'), variant: 'ghost' as const },
+    { label: copy.billing, action: () => setView('billing'), variant: 'ghost' as const },
+    { label: copy.refresh, action: refreshQueueData, variant: 'ghost' as const },
+  ]
+
   return (
     <main dir={dir} style={{ minHeight: '100vh', padding: '88px 20px 28px', background: 'var(--bg)' }}>
       <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '280px minmax(0, 1fr)', gap: '18px', alignItems: 'start' }}>
-          <aside style={{ ...panelStyle, position: 'sticky', top: '92px', padding: '20px' }}>
+        <div className="dashboard-shell" style={{ display: 'grid', gridTemplateColumns: '280px minmax(0, 1fr)', gap: '18px', alignItems: 'start' }}>
+          <aside className="dashboard-sidebar" style={{ ...panelStyle, position: 'sticky', top: '92px', padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'linear-gradient(135deg, var(--accent), var(--accent-2))', display: 'grid', placeItems: 'center', fontSize: '20px' }}>🏢</div>
               <div>
@@ -437,7 +518,7 @@ export default function BusinessDashboard() {
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '18px' }}>
-              {sidebarItems.map((item) => (
+              {enabledSidebarItems.map((item) => (
                 <motion.button
                   key={item.id}
                   onClick={() => setView(item.id)}
@@ -491,7 +572,7 @@ export default function BusinessDashboard() {
             </div>
           </aside>
 
-          <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <section className="dashboard-content" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={sectionStyle}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', padding: '18px 20px', borderBottom: '1px solid var(--border)', flexWrap: 'wrap' }}>
                 <div>
@@ -518,11 +599,23 @@ export default function BusinessDashboard() {
               </div>
 
               <div style={{ padding: '16px 20px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                <Button variant="ghost" onClick={handlePause}>{copy.pause}</Button>
-                <Button variant="ghost" onClick={handleResume}>{copy.resume}</Button>
-                <Button variant="ghost" onClick={handleResetCounter}>{copy.reset}</Button>
-                <Button variant="ghost" onClick={handleMarkNoShow}>{copy.noshow}</Button>
-                <Button variant="ghost" onClick={() => window.open(`/screen/${activeQueueId}`, '_blank')}>{copy.openScreen}</Button>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', width: '100%' }}>
+                  {topActions.map((item) => (
+                    <Button key={item.label} variant={item.variant} onClick={item.action} size="sm" fullWidth>
+                      {item.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ padding: '0 20px 16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px', alignItems: 'stretch' }}>
+                  {utilityActions.map((item) => (
+                    <Button key={item.label} variant={item.variant} onClick={item.action} size="sm" fullWidth>
+                      {item.label}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -538,11 +631,11 @@ export default function BusinessDashboard() {
             ) : (
               <>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: '12px' }}>
-                  <StatCard label={copy.waiting} value={state?.waitingCount || 0} accent delay={0} sparkData={weeklySeries} />
-                  <StatCard label={copy.serving} value={state?.currentlyServing?.ticket_number || 0} delay={0.1} />
-                  <StatCard label={copy.avgWait} value={Math.round((state?.averageWaitSeconds || 0) / 60)} unit="m" delay={0.2} />
+                  <StatCard label={copy.waiting} value={displayState?.waitingCount || 0} accent delay={0} sparkData={weeklySeries} />
+                  <StatCard label={copy.serving} value={displayState?.currentlyServing?.ticket_number || 0} delay={0.1} />
+                  <StatCard label={copy.avgWait} value={Math.round((displayState?.averageWaitSeconds || 0) / 60)} unit="m" delay={0.2} />
                   <StatCard label={copy.rating} value={parseFloat(rating?.avg_rating || '0')} delay={0.3} accent />
-                  <StatCard label={copy.queueSize} value={state?.tickets.length || 0} delay={0.4} />
+                  <StatCard label={copy.queueSize} value={displayState?.tickets?.length || 0} delay={0.4} />
                 </div>
 
                 <AnimatePresence mode="wait">
@@ -608,7 +701,7 @@ export default function BusinessDashboard() {
                           <p style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-3)' }}>{copy.liveQueue}</p>
                           <h3 style={{ fontSize: '20px', color: 'var(--text-1)', marginTop: '6px' }}>{copy.queueActive}</h3>
                         </div>
-                        <span style={{ color: 'var(--text-3)', fontSize: '13px' }}>{state?.waitingCount || 0} {copy.waiting}</span>
+                        <span style={{ color: 'var(--text-3)', fontSize: '13px' }}>{displayState?.waitingCount || 0} {copy.waiting}</span>
                       </div>
                       <div style={{ padding: '18px 20px', display: 'grid', gap: '12px' }}>
                         <Button onClick={handleCallNext} fullWidth size="lg">{copy.callNext}</Button>
@@ -692,7 +785,7 @@ export default function BusinessDashboard() {
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px' }}>
                           <div style={{ padding: '14px', borderRadius: '16px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)' }}>
                             <p style={{ fontSize: '11px', color: 'var(--text-3)', textTransform: 'uppercase' }}>{copy.waiting}</p>
-                            <p style={{ fontSize: '24px', fontWeight: 800, marginTop: '8px' }}>{state?.waitingCount || 0}</p>
+                            <p style={{ fontSize: '24px', fontWeight: 800, marginTop: '8px' }}>{displayState?.waitingCount || 0}</p>
                           </div>
                           <div style={{ padding: '14px', borderRadius: '16px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)' }}>
                             <p style={{ fontSize: '11px', color: 'var(--text-3)', textTransform: 'uppercase' }}>{copy.peak}</p>

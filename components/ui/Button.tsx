@@ -9,11 +9,14 @@ interface Props {
   disabled?: boolean
   fullWidth?: boolean
   size?: 'sm' | 'md' | 'lg'
+  iconLeft?: ReactNode
+  iconRight?: ReactNode
+  type?: 'button' | 'submit' | 'reset'
 }
 
 const variants = {
   primary: {
-    background: 'linear-gradient(135deg, #7c6dfa, #a78bfa)',
+    background: 'linear-gradient(135deg, var(--accent), var(--accent-2))',
     color: 'white',
     border: 'none',
   },
@@ -42,9 +45,13 @@ export const Button = ({
   disabled = false,
   fullWidth = false,
   size = 'md'
+  iconLeft,
+  iconRight,
+  type = 'button'
 }: Props) => {
   return (
     <motion.button
+      type={type}
       onClick={onClick}
       disabled={disabled}
       whileHover={{ scale: disabled ? 1 : 1.02, y: disabled ? 0 : -1 }}
@@ -65,7 +72,9 @@ export const Button = ({
         gap: '8px',
       }}
     >
+      {iconLeft}
       {children}
+      {iconRight}
     </motion.button>
   )
 }

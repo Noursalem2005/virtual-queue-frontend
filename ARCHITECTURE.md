@@ -321,7 +321,7 @@ See `frontend/lib/backend-api-spec.ts` for complete endpoint documentation.
 
 ---
 
-## 🎮 Demo Usage
+## 🎮 Preview Usage
 
 ```tsx
 // Open command palette

@@ -11,7 +11,7 @@ const parseJsonSafely = async (res: Response): Promise<unknown> => {
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 
-const request = async (path: string, init?: RequestInit) => {
+const request = async <T = any>(path: string, init?: RequestInit): Promise<T> => {
   const res = await fetch(`${BASE}${path}`, init)
   const data = await parseJsonSafely(res)
 
@@ -26,7 +26,7 @@ const request = async (path: string, init?: RequestInit) => {
           fallbackError,
         status: res.status,
         ok: false,
-      }
+      } as T
     }
 
     return {
@@ -34,22 +34,22 @@ const request = async (path: string, init?: RequestInit) => {
       data,
       status: res.status,
       ok: false,
-    }
+    } as T
   }
 
-  if (Array.isArray(data)) return data
-  if (!isPlainObject(data)) return { ok: true, status: res.status }
+  if (Array.isArray(data)) return data as T
+  if (!isPlainObject(data)) return { ok: true, status: res.status } as T
 
   return {
     ...data,
     status: res.status,
     ok: true,
-  }
+  } as T
 }
 
 export const api = {
-  post: async (path: string, body: unknown, token?: string) =>
-    request(path, {
+  post: async <T = any>(path: string, body: unknown, token?: string) =>
+    request<T>(path, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -58,8 +58,8 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
-  patch: async (path: string, body: unknown, token?: string) =>
-    request(path, {
+  patch: async <T = any>(path: string, body: unknown, token?: string) =>
+    request<T>(path, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -68,8 +68,8 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
-  get: async (path: string, token?: string) =>
-    request(path, {
+  get: async <T = any>(path: string, token?: string) =>
+    request<T>(path, {
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }),
       },

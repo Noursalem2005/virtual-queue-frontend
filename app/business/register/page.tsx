@@ -76,6 +76,8 @@ export default function BusinessRegister() {
         { value: 'pharmacy', label: '💊 Pharmacy' },
         { value: 'other', label: '📌 Other' },
       ]
+
+  const handleStep1 = () => {
     if (!email || !password) {
       setError(isArabic ? 'يرجى ملء جميع الحقول' : 'Please fill in all fields')
       return

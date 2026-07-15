@@ -145,8 +145,15 @@ export const NotificationHub: React.FC = () => {
  * Usage: addNotification({type: 'success', title: 'Ticket served', message: 'Customer #5'})
  */
 export const addNotificationToHub = (
-  notification: Omit<Parameters<typeof setNotifications>[0][0], 'id' | 'timestamp'>
+  notification: {
+    type: 'info' | 'success' | 'error' | 'command';
+    title: string;
+    message: string;
+    actionable?: boolean;
+    action?: { label: string; command: unknown };
+  }
 ) => {
+  void notification;
   // This is used in components via useAtom hook
   // Example: const [, setNotifications] = useAtom(notificationHubAtom);
   // setNotifications(prev => [...prev, {

@@ -19,7 +19,7 @@ interface CommandItem {
   description: string;
   icon: string;
   category: string;
-  command: any;
+  command: Parameters<ReturnType<typeof useCommandBus>['execute']>[0];
   keywords: string[];
   hotkey?: string;
   suggested?: boolean; // AI-suggested
@@ -29,7 +29,7 @@ export const CommandPalette: React.FC = () => {
   const [isOpen, setIsOpen] = useAtom(commandPaletteOpenAtom);
   const [search, setSearch] = useAtom(commandPaletteSearchAtom);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [, suggestions] = useAtom(aiSuggestionsAtom);
+  const [suggestions] = useAtom(aiSuggestionsAtom);
   const { execute } = useCommandBus();
   const { t, lang, dir } = useLang();
 
@@ -171,7 +171,7 @@ export const CommandPalette: React.FC = () => {
       command: { type: 'NAVIGATE_VIEW', view: 'analytics' },
       keywords: ['analytics', 'stats', 'data'],
     },
-  ], [t]);
+  ] as CommandItem[], [t, suggestions.nextRecommendedAction]);
 
   // FILTER & SORT COMMANDS
   const filteredCommands = useMemo(() => {
@@ -188,7 +188,7 @@ export const CommandPalette: React.FC = () => {
         if (!a.suggested && b.suggested) return 1;
         return 0;
       });
-  }, [search]);
+  }, [allCommands, search]);
 
   // KEYBOARD NAVIGATION
   useEffect(() => {

@@ -56,7 +56,7 @@ export const availableTemplatesAtom = atom<any[]>([]);
 
 // 2FA & SECURITY
 export const twoFactorEnabledAtom = atom(false);
-export const twoFactorMethodAtom = atom('email'); // 'email', 'sms', 'totp'
+export const twoFactorMethodAtom = atom<'email' | 'sms' | 'totp'>('email');
 export const loginHistoryAtom = atom<
   Array<{
     timestamp: Date;
