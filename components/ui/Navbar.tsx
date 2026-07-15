@@ -1,27 +1,40 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { useTheme } from 'next-themes'
 import { useLang } from '../providers/LangProvider'
 
 export function Navbar() {
-  const { lang, setLang, dir } = useLang()
+  const { lang, setLang, dir, t } = useLang()
+  const { resolvedTheme, theme, setTheme } = useTheme()
   const isArabic = lang === 'ar'
   const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  const nav = isArabic
-    ? {
-        home: 'الرئيسية',
-        discover: 'استكشاف',
-        business: 'للأعمال',
-        language: 'EN',
-      }
-    : {
-        home: 'Home',
-        discover: 'Discover',
-        business: 'Business',
-        language: 'العربية',
-      }
+  const currentTheme = mounted ? (resolvedTheme || theme || 'dark') : 'dark'
+
+  const toggleTheme = () => {
+    setTheme(currentTheme === 'dark' ? 'light' : 'dark')
+  }
+
+  const nav = t.nav || {
+    home: isArabic ? 'الرئيسية' : 'Home',
+    join: isArabic ? 'انضم لطابور' : 'Join a Queue',
+    discover: isArabic ? 'استكشاف' : 'Discover',
+    register: isArabic ? 'تسجيل الأعمال' : 'Business Register',
+    login: isArabic ? 'دخول الأعمال' : 'Business Login',
+    developers: isArabic ? 'المطورين' : 'Developers',
+    dashboard: isArabic ? 'لوحة التحكم' : 'Dashboard',
+    themeLight: isArabic ? 'الوضع الفاتح' : 'Light mode',
+    themeDark: isArabic ? 'الوضع الداكن' : 'Dark mode',
+  }
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const languageLabel = isArabic ? 'EN' : 'العربية'
 
   const linkStyle = {
     color: 'var(--text-2)',
@@ -84,13 +97,39 @@ export function Navbar() {
           <Link href="/" style={linkStyle as any} onMouseEnter={(e: any) => (e.currentTarget.style.color = 'var(--accent)')} onMouseLeave={(e: any) => (e.currentTarget.style.color = 'var(--text-2)')}>
             {nav.home}
           </Link>
+          <Link href="/join" style={linkStyle as any} onMouseEnter={(e: any) => (e.currentTarget.style.color = 'var(--accent)')} onMouseLeave={(e: any) => (e.currentTarget.style.color = 'var(--text-2)')}>
+            {nav.join}
+          </Link>
           <Link href="/discover" style={linkStyle as any} onMouseEnter={(e: any) => (e.currentTarget.style.color = 'var(--accent)')} onMouseLeave={(e: any) => (e.currentTarget.style.color = 'var(--text-2)')}>
             {nav.discover}
+          </Link>
+          <Link href="/developers" style={linkStyle as any} onMouseEnter={(e: any) => (e.currentTarget.style.color = 'var(--accent)')} onMouseLeave={(e: any) => (e.currentTarget.style.color = 'var(--text-2)')}>
+            {nav.developers}
           </Link>
         </div>
 
         {/* Right Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <motion.button
+            type="button"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={toggleTheme}
+            aria-label={currentTheme === 'dark' ? nav.themeLight : nav.themeDark}
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: '9px',
+              padding: '7px 11px',
+              color: 'var(--text-1)',
+              fontSize: '12px',
+              fontWeight: '700',
+              cursor: 'pointer',
+            }}
+          >
+            {currentTheme === 'dark' ? '☾' : '☀'}
+          </motion.button>
+
           {/* Language Toggle */}
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -116,7 +155,7 @@ export function Navbar() {
               e.currentTarget.style.borderColor = 'var(--border)'
             }}
           >
-            {nav.language}
+            {languageLabel}
           </motion.button>
 
           {/* Business CTA */}
@@ -143,7 +182,7 @@ export function Navbar() {
                 e.currentTarget.style.boxShadow = 'none'
               }}
             >
-              {nav.business}
+              {nav.login}
             </Link>
           </motion.div>
 
@@ -172,14 +211,23 @@ export function Navbar() {
       {showMobileMenu && (
         <div className="nav-mobile-panel" style={{ display: 'block', borderTop: '1px solid var(--border)', background: 'var(--nav-bg)', backdropFilter: 'blur(12px)' }}>
           <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '14px 24px 18px', display: 'grid', gap: '12px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px' }}>
               <Link href="/" style={{ textDecoration: 'none', color: 'var(--text-1)', border: '1px solid var(--border)', borderRadius: '12px', padding: '12px 14px', background: 'var(--surface)' }}>{nav.home}</Link>
+              <Link href="/join" style={{ textDecoration: 'none', color: 'var(--text-1)', border: '1px solid var(--border)', borderRadius: '12px', padding: '12px 14px', background: 'var(--surface)' }}>{nav.join}</Link>
               <Link href="/discover" style={{ textDecoration: 'none', color: 'var(--text-1)', border: '1px solid var(--border)', borderRadius: '12px', padding: '12px 14px', background: 'var(--surface)' }}>{nav.discover}</Link>
-              <Link href="/business/login" style={{ textDecoration: 'none', color: 'white', borderRadius: '12px', padding: '12px 14px', background: 'linear-gradient(135deg, var(--accent), var(--accent-2))' }}>{nav.business}</Link>
+              <Link href="/developers" style={{ textDecoration: 'none', color: 'var(--text-1)', border: '1px solid var(--border)', borderRadius: '12px', padding: '12px 14px', background: 'var(--surface)' }}>{nav.developers}</Link>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-              <Link href="/join" style={{ textDecoration: 'none', color: 'var(--text-1)', border: '1px solid var(--border)', borderRadius: '999px', padding: '10px 14px', background: 'var(--surface)' }}>Join queue</Link>
-              <Link href="/business/dashboard" style={{ textDecoration: 'none', color: 'var(--text-1)', border: '1px solid var(--border)', borderRadius: '999px', padding: '10px 14px', background: 'var(--surface)' }}>Dashboard</Link>
+              <Link href="/business/login" style={{ textDecoration: 'none', color: 'white', borderRadius: '999px', padding: '10px 14px', background: 'linear-gradient(135deg, var(--accent), var(--accent-2))' }}>{nav.login}</Link>
+              <Link href="/business/dashboard" style={{ textDecoration: 'none', color: 'var(--text-1)', border: '1px solid var(--border)', borderRadius: '999px', padding: '10px 14px', background: 'var(--surface)' }}>{nav.dashboard}</Link>
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={toggleTheme} style={{ flex: 1, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '12px 14px', color: 'var(--text-1)', fontWeight: 700 }}>
+                {currentTheme === 'dark' ? nav.themeLight : nav.themeDark}
+              </button>
+              <button onClick={() => setLang(lang === 'en' ? 'ar' : 'en')} style={{ flex: 1, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '12px 14px', color: 'var(--text-1)', fontWeight: 700 }}>
+                {languageLabel}
+              </button>
             </div>
           </div>
         </div>

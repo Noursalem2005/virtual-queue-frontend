@@ -8,11 +8,15 @@ export type Lang = keyof typeof languages
 export const translations = {
   en: {
     nav: {
+      home: 'Home',
       join: 'Join a Queue',
       discover: 'Discover',
       register: 'Business Register',
       login: 'Business Login',
       developers: 'Developers',
+      dashboard: 'Dashboard',
+      themeLight: 'Light mode',
+      themeDark: 'Dark mode',
     },
     hero: {
       badge: 'Now with API access for businesses',
@@ -91,11 +95,15 @@ export const translations = {
   },
   ar: {
     nav: {
+      home: 'الرئيسية',
       join: 'انضم لطابور',
       discover: 'استكشف',
       register: 'تسجيل الأعمال',
       login: 'دخول الأعمال',
       developers: 'المطورين',
+      dashboard: 'لوحة التحكم',
+      themeLight: 'الوضع الفاتح',
+      themeDark: 'الوضع الداكن',
     },
     hero: {
       badge: 'متاح الآن: API للشركات',

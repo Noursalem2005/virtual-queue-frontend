@@ -58,7 +58,27 @@ const seedPreview = () => {
 
 export default function Home() {
   const orbRef = useRef<HTMLDivElement>(null)
-  const { t, dir } = useLang()
+  const { t, dir, lang } = useLang()
+  const nav = t.nav || {}
+  const heroCta = t.hero || {}
+  const isArabic = lang === 'ar'
+
+  const featureCardsLocalized = isArabic
+    ? [
+        { label: 'الطابور المباشر', value: '42 منتظر', detail: 'استدعاء، خدمة، إيقاف، استئناف، عدم حضور، وأولوية.' },
+        { label: 'الانضمام للعميل', value: 'QR جاهز', detail: 'ينضم الزائر من الهاتف ويستلم تذكرة واضحة فورًا.' },
+        { label: 'المواعيد', value: '12 اليوم', detail: 'المواعيد المجدولة ترتبط مباشرة بإدارة الطابور.' },
+        { label: 'التحليلات', value: '73% أسرع', detail: 'حركة أسبوعية، أوقات الانتظار، التقييم، والأداء.' },
+      ]
+    : featureCards
+
+  const workflowLocalized = isArabic
+    ? [
+        { step: '01', title: 'ينضم العميل', text: 'يمسح QR، يختار الخدمة، ويستلم رقم التذكرة.' },
+        { step: '02', title: 'يتحكم الموظف', text: 'لوحة التحكم تحدّث الطابور والتذكرة الحالية.' },
+        { step: '03', title: 'تتحدث الشاشة', text: 'شاشة الاستقبال والإشعارات تبقي الزائرين على اطلاع.' },
+      ]
+    : workflow
 
   useEffect(() => {
     const handleMouse = (e: MouseEvent) => {
@@ -170,15 +190,18 @@ export default function Home() {
           transition={{ duration: 0.6, delay: 0.3 }}
           style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}
         >
-          <Link href="/business/dashboard" onClick={seedPreview}>
-            <Button size="lg">Explore dashboard</Button>
-          </Link>
           <Link href="/join">
-            <Button size="lg" variant="ghost">{t.hero.cta1}</Button>
+            <Button size="lg">{nav.join || 'Join a queue'}</Button>
           </Link>
-          <Link href="/business/login">
-            <Button size="lg" variant="ghost">{t.hero.cta2}</Button>
+          <Link href="/business/login" onClick={seedPreview}>
+            <Button size="lg" variant="ghost">{heroCta.cta2 || 'Business Login'}</Button>
           </Link>
+          <Link href="/discover">
+            <Button size="lg" variant="ghost">{nav.discover || 'Discover'}</Button>
+          </Link>
+          <a href="#how-it-works" style={{ textDecoration: 'none' }}>
+            <Button size="lg" variant="ghost">{isArabic ? 'كيف يعمل' : 'How it works'}</Button>
+          </a>
         </motion.div>
 
         <motion.div
@@ -207,15 +230,15 @@ export default function Home() {
         </motion.div>
       </section>
 
-      <section style={{ position: 'relative', zIndex: 2, padding: '24px 24px 100px' }}>
+      <section id="how-it-works" style={{ position: 'relative', zIndex: 2, padding: '24px 24px 100px' }}>
         <div style={{ maxWidth: '1160px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <p style={{ color: 'var(--accent-2)', fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 800 }}>Platform features</p>
-            <h2 style={{ color: 'var(--text-1)', fontSize: 'clamp(30px, 5vw, 48px)', marginTop: '10px', letterSpacing: '-1px' }}>Everything a queue needs, connected</h2>
+            <p style={{ color: 'var(--accent-2)', fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 800 }}>{isArabic ? 'مزايا المنصة' : 'Platform features'}</p>
+            <h2 style={{ color: 'var(--text-1)', fontSize: 'clamp(30px, 5vw, 48px)', marginTop: '10px', letterSpacing: '-1px' }}>{isArabic ? 'كل ما يحتاجه الطابور في مكان واحد' : 'Everything a queue needs, connected'}</h2>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
-            {featureCards.map((feature, index) => (
+            {featureCardsLocalized.map((feature, index) => (
               <motion.div
                 key={feature.label}
                 initial={{ opacity: 0, y: 16 }}
@@ -234,9 +257,9 @@ export default function Home() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '18px', marginTop: '18px' }}>
             <div className="glass" style={{ borderRadius: '12px', padding: '22px' }}>
-              <p style={{ color: 'var(--accent-2)', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 800 }}>Live operations</p>
+              <p style={{ color: 'var(--accent-2)', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 800 }}>{isArabic ? 'العمليات الحية' : 'Live operations'}</p>
               <div style={{ display: 'grid', gap: '12px', marginTop: '18px' }}>
-                {workflow.map((item) => (
+                {workflowLocalized.map((item) => (
                   <div key={item.step} style={{ display: 'grid', gridTemplateColumns: '44px minmax(0, 1fr)', gap: '14px', alignItems: 'start', padding: '14px', border: '1px solid var(--border)', borderRadius: '12px', background: 'rgba(255,255,255,0.03)' }}>
                     <strong style={{ color: 'var(--green)', fontSize: '15px' }}>{item.step}</strong>
                     <div>
@@ -251,7 +274,7 @@ export default function Home() {
             <div className="glass" style={{ borderRadius: '12px', padding: '22px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', alignItems: 'flex-start' }}>
                 <div>
-                  <p style={{ color: 'var(--accent-2)', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 800 }}>Dashboard preview</p>
+                  <p style={{ color: 'var(--accent-2)', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 800 }}>{isArabic ? 'معاينة لوحة التحكم' : 'Dashboard preview'}</p>
                   <h3 style={{ color: 'var(--text-1)', fontSize: '28px', marginTop: '8px' }}>Main Branch</h3>
                 </div>
                 <span style={{ color: 'var(--green)', border: '1px solid rgba(29,209,161,0.28)', background: 'rgba(29,209,161,0.1)', borderRadius: '999px', padding: '7px 11px', fontSize: '12px', fontWeight: 800 }}>Live</span>

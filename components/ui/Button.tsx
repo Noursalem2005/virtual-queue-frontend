@@ -44,7 +44,7 @@ export const Button = ({
   variant = 'primary',
   disabled = false,
   fullWidth = false,
-  size = 'md'
+  size = 'md',
   iconLeft,
   iconRight,
   type = 'button'
