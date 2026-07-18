@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { useTheme } from 'next-themes'
 import { gsap } from 'gsap'
 import Link from 'next/link'
 import { Button } from '../components/ui/Button'
@@ -12,11 +13,14 @@ const previewAccount = {
   queueId: 'main-branch',
 }
 
+
 const floatingTickets = [
-  { number: 47, x: '8%', y: '20%', delay: 0 },
-  { number: 12, x: '82%', y: '15%', delay: 0.3 },
-  { number: 93, x: '75%', y: '65%', delay: 0.6 },
-  { number: 28, x: '5%', y: '68%', delay: 0.9 },
+  { number: 12, x: '3%', y: '28%', delay: 0, color: 'var(--accent)' },
+  { number: 28, x: '90%', y: '30%', delay: .4, color: 'var(--green)' },
+  { number: 41, x: '4%', y: '82%', delay: .8, color: 'var(--accent-2)' },
+  { number: 56, x: '92%', y: '78%', delay: 1.2, color: 'var(--accent)' },
+  { number: 73, x: '50%', y: '6%', delay: .6, color: 'var(--green)' },
+  { number: 91, x: '62%', y: '90%', delay: 1.0, color: 'var(--accent-2)' },
 ]
 
 const featureCards = [
@@ -57,10 +61,10 @@ const seedPreview = () => {
 }
 
 export default function Home() {
-  const orbRef = useRef<HTMLDivElement>(null)
   const { t, dir, lang } = useLang()
+  const { resolvedTheme } = useTheme()
+  const orbRef = useRef<HTMLDivElement>(null)
   const nav = t.nav || {}
-  const heroCta = t.hero || {}
   const isArabic = lang === 'ar'
 
   const featureCardsLocalized = isArabic
@@ -80,57 +84,76 @@ export default function Home() {
       ]
     : workflow
 
+
   useEffect(() => {
-    const handleMouse = (e: MouseEvent) => {
+    const move = (e: MouseEvent) => {
       if (!orbRef.current) return
-      const x = (e.clientX / window.innerWidth - 0.5) * 40
-      const y = (e.clientY / window.innerHeight - 0.5) * 40
-      gsap.to(orbRef.current, { x, y, duration: 1.5, ease: 'power2.out' })
+      const x = (e.clientX / window.innerWidth - .5) * 20
+      const y = (e.clientY / window.innerHeight - .5) * 20
+      gsap.to(orbRef.current,{x,y,duration:1.5,ease:'power2.out'})
     }
-    window.addEventListener('mousemove', handleMouse)
-    return () => window.removeEventListener('mousemove', handleMouse)
-  }, [])
+    window.addEventListener('mousemove',move)
+    return ()=>window.removeEventListener('mousemove',move)
+  },[])
 
   return (
-    <main dir={dir} style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden', background: 'var(--bg)' }}>
-      <div ref={orbRef} style={{
-        position: 'absolute', top: '12%', left: '50%',
-        transform: 'translateX(-50%)',
-        width: '640px', height: '640px',
-        background: 'radial-gradient(circle, rgba(124,109,250,0.12) 0%, transparent 70%)',
-        pointerEvents: 'none', zIndex: 0
-      }} />
+    <main dir={dir} className="home-main" style={{position:'relative',overflow:'hidden'}}
+><style>{`@media(max-width:900px){.floating-ticket{display:none}.hero-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:10px!important}.features-grid{grid-template-columns:1fr!important}.preview-grid{grid-template-columns:1fr!important}}@media(max-width:600px){.hero-actions{grid-template-columns:1fr!important}.hero-title{font-size:clamp(40px,14vw,64px)!important}.hero-sub{font-size:16px!important}.hero-section{padding:84px 20px 40px!important}}`}</style>
+      <div
+        ref={orbRef}
+        style={{
+          position:'absolute',
+          inset:'0',
+          pointerEvents:'none',
+          zIndex:0,
+          display:'flex',
+          justifyContent:'center'
+        }}
+      >
+        <div
+          style={{
+            width:700,
+            height:700,
+            marginTop:40,
+            borderRadius:'50%',
+            background: resolvedTheme==='light'
+              ? 'radial-gradient(circle, rgba(91,109,255,.12) 0%, rgba(91,109,255,.05) 40%, transparent 72%)'
+              : 'radial-gradient(circle, rgba(124,109,250,.16) 0%, rgba(124,109,250,.06) 35%, transparent 72%)'
+          }}
+        />
+      </div>
 
-      {floatingTickets.map((ticket, i) => (
+      {floatingTickets.map(ticket=>(
         <motion.div
           key={ticket.number}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1, y: [0, -12, 0] }}
-          transition={{
-            opacity: { delay: ticket.delay + 0.5, duration: 0.6 },
-            scale: { delay: ticket.delay + 0.5, duration: 0.6 },
-            y: { delay: ticket.delay, duration: 4, repeat: Infinity, ease: 'easeInOut' }
-          }}
-          style={{
-            position: 'absolute', left: ticket.x, top: ticket.y,
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid var(--border)',
-            borderRadius: '12px', padding: '12px 20px',
-            backdropFilter: 'blur(12px)', zIndex: 1,
-            display: 'flex', alignItems: 'center', gap: '10px'
+          initial={{opacity:0,scale:.8}}
+          animate={{opacity:1,y:[0,-8,0]}}
+          transition={{opacity:{duration:.5,delay:ticket.delay},y:{duration:8,repeat:Infinity,ease:'easeInOut'}}}
+          className='floating-ticket' style={{
+            position:'absolute',
+            left:ticket.x,
+            top:ticket.y,
+            zIndex:1,
+            padding:'12px 18px',
+            borderRadius:16,
+            backdropFilter:'blur(16px)',
+            background: resolvedTheme==='light' ? 'rgba(255,255,255,.65)' : 'rgba(255,255,255,.04)',
+            border:'1px solid var(--border)',
+            boxShadow: resolvedTheme==='light'
+              ? '0 12px 40px rgba(0,0,0,.08)'
+              : '0 16px 40px rgba(0,0,0,.22)'
           }}
         >
-          <div style={{
-            width: '8px', height: '8px', borderRadius: '50%',
-            background: i % 2 === 0 ? 'var(--accent)' : 'var(--green)',
-            boxShadow: i % 2 === 0 ? '0 0 8px var(--accent)' : '0 0 8px var(--green)'
-          }} />
-          <span style={{ color: 'var(--text-2)', fontSize: '13px' }}>Ticket</span>
-          <span style={{ color: 'var(--text-1)', fontSize: '13px', fontWeight: 700 }}>#{ticket.number}</span>
+          <div style={{display:'flex',alignItems:'center',gap:10}}>
+            <span style={{width:8,height:8,borderRadius:'50%',background:ticket.color,boxShadow:`0 0 12px ${ticket.color}`}}/>
+            <div>
+              <div style={{fontSize:11,color:'var(--text-2)',textTransform:'uppercase'}}>Ticket</div>
+              <div style={{fontWeight:800,color:'var(--text-1)'}}>#{ticket.number}</div>
+            </div>
+          </div>
         </motion.div>
       ))}
-
-      <section style={{
+      <section className="hero-section" style={{
         position: 'relative', zIndex: 2,
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
@@ -153,7 +176,7 @@ export default function Home() {
           <span style={{ color: 'var(--accent-2)', fontSize: '13px', fontWeight: 500 }}>{t.hero.badge}</span>
         </motion.div>
 
-        <motion.h1
+        <motion.h1 className="hero-title"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
@@ -171,7 +194,7 @@ export default function Home() {
           <span style={{ color: 'var(--text-1)' }}>{t.hero.title2}</span>
         </motion.h1>
 
-        <motion.p
+        <motion.p className="hero-sub"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -188,16 +211,19 @@ export default function Home() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}
+          className='hero-actions' style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}
         >
           <Link href="/join">
             <Button size="lg">{nav.join || 'Join a queue'}</Button>
           </Link>
-          <Link href="/business/login" onClick={seedPreview}>
-            <Button size="lg" variant="ghost">{heroCta.cta2 || 'Business Login'}</Button>
+          <Link href="/business/register">
+            <Button size="lg" variant="ghost">{isArabic ? 'ابدأ نشاطك' : 'Start your business'}</Button>
           </Link>
           <Link href="/discover">
             <Button size="lg" variant="ghost">{nav.discover || 'Discover'}</Button>
+          </Link>
+          <Link href="/business/dashboard" onClick={seedPreview}>
+            <Button size="lg" variant="ghost">{isArabic ? 'معاينة اللوحة' : 'Open live preview'}</Button>
           </Link>
           <a href="#how-it-works" style={{ textDecoration: 'none' }}>
             <Button size="lg" variant="ghost">{isArabic ? 'كيف يعمل' : 'How it works'}</Button>
@@ -231,14 +257,14 @@ export default function Home() {
       </section>
 
       <section id="how-it-works" style={{ position: 'relative', zIndex: 2, padding: '24px 24px 100px' }}>
-        <div style={{ maxWidth: '1160px', margin: '0 auto' }}>
+        <div className="app-container-lg">
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
             <p style={{ color: 'var(--accent-2)', fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 800 }}>{isArabic ? 'مزايا المنصة' : 'Platform features'}</p>
             <h2 style={{ color: 'var(--text-1)', fontSize: 'clamp(30px, 5vw, 48px)', marginTop: '10px', letterSpacing: '-1px' }}>{isArabic ? 'كل ما يحتاجه الطابور في مكان واحد' : 'Everything a queue needs, connected'}</h2>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
-            {featureCardsLocalized.map((feature, index) => (
+            {featureCardsLocalized.slice(0,3).map((feature, index) => (
               <motion.div
                 key={feature.label}
                 initial={{ opacity: 0, y: 16 }}

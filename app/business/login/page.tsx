@@ -118,6 +118,7 @@ export default function BusinessLogin() {
 
   return (
     <main
+      className="auth-page"
       dir={dir}
       style={{
         minHeight: '100vh',
@@ -129,9 +130,9 @@ export default function BusinessLogin() {
         marginTop: '60px',
       }}
     >
-      <div style={{ maxWidth: '1000px', width: '100%', display: 'grid', gridTemplateColumns: 'clamp(0px, 1fr, 500px) clamp(0px, 1fr, 420px)', gap: '60px', alignItems: 'center' }}>
+      <div className="auth-shell" style={{ maxWidth: '1000px', width: '100%', display: 'grid', gridTemplateColumns: 'clamp(0px, 1fr, 500px) clamp(0px, 1fr, 420px)', gap: '60px', alignItems: 'center' }}>
         {/* Left - Hero Section */}
-        <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7 }}>
+        <motion.div className="auth-copy" initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35 }}>
           <div style={{ marginBottom: '40px' }}>
             <motion.div
               initial={{ scale: 0.8 }}
@@ -179,13 +180,13 @@ export default function BusinessLogin() {
           </div>
 
           {/* Features Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+          <div className="auth-feature-list" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
             {copy.features.map((feature, idx) => (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0, x: -30 }}
+                initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 + idx * 0.1 }}
+                transition={{ delay: 0.12 + idx * 0.04 }}
                 style={{
                   padding: '18px',
                   borderRadius: '12px',
@@ -208,9 +209,10 @@ export default function BusinessLogin() {
 
         {/* Right - Login Form */}
         <motion.div
-          initial={{ opacity: 0, x: 50 }}
+          className="auth-card"
+          initial={{ opacity: 0, x: 18 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
+          transition={{ duration: 0.35, delay: 0.05 }}
           style={{
             padding: '48px',
             borderRadius: '20px',

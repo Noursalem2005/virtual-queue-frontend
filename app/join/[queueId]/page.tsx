@@ -79,7 +79,6 @@ export default function JoinQueue() {
 
   const pageStyle: CSSProperties = {
     minHeight: '100vh',
-    padding: '88px 20px 32px',
   }
 
   const panelStyle: CSSProperties = {
@@ -96,8 +95,8 @@ export default function JoinQueue() {
   ]
 
   return (
-    <main dir={dir} className="customer-page" style={pageStyle}>
-      <div style={{ maxWidth: '1140px', margin: '0 auto' }}>
+    <main dir={dir} className="customer-page app-page" style={pageStyle}>
+      <div className="app-container-lg">
         <motion.section
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -108,7 +107,7 @@ export default function JoinQueue() {
             background: 'linear-gradient(135deg, rgba(124,109,250,0.12), rgba(245,158,11,0.08)), var(--bg-2)'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' }}>
+          <div className="join-hero-row" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' }}>
             <div style={{ maxWidth: '720px' }}>
               <p style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--accent)', marginBottom: '12px' }}>{copy.stepInfo}</p>
               <h1 style={{ fontFamily: 'Syne,sans-serif', fontSize: 'clamp(30px, 4.6vw, 54px)', lineHeight: 0.98, letterSpacing: '-0.05em', color: 'var(--text-1)', marginBottom: '14px' }}>
@@ -116,15 +115,15 @@ export default function JoinQueue() {
               </h1>
               <p style={{ color: 'var(--text-2)', fontSize: '16px', lineHeight: 1.8, maxWidth: '680px' }}>{queue?.description || t.join.subtitle}</p>
             </div>
-            <div style={{ minWidth: '220px', display: 'flex', justifyContent: 'flex-end' }}>
-              <div style={{ padding: '14px 16px', borderRadius: '18px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.04)', minWidth: '220px' }}>
+            <div className="join-priority-wrap" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <div className="join-priority-card" style={{ padding: '14px 16px', borderRadius: '18px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.04)' }}>
                 <p style={{ fontSize: '11px', color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '10px' }}>{copy.priorityTitle}</p>
                 <p style={{ color: 'var(--text-1)', fontSize: '13px', lineHeight: 1.7 }}>{copy.priorityText}</p>
               </div>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px', marginTop: '18px' }}>
+          <div className="join-meta-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px', marginTop: '18px' }}>
             {queueMeta.map((item) => (
               <div key={item.label} style={{ padding: '16px', borderRadius: '18px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)' }}>
                 <p style={{ fontSize: '11px', color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{item.label}</p>
@@ -134,7 +133,7 @@ export default function JoinQueue() {
           </div>
         </motion.section>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.92fr) minmax(0, 1.08fr)', gap: '18px', alignItems: 'start' }}>
+        <div className="join-main-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 0.92fr) minmax(0, 1.08fr)', gap: '18px', alignItems: 'start' }}>
           <motion.section
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}

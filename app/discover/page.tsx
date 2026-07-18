@@ -78,8 +78,13 @@ export default function DiscoverPage() {
       const params = new URLSearchParams()
       if (search) params.append('search', search)
       if (selectedCategory !== 'all') params.append('category', selectedCategory)
-      const response = await api.get(`/queues/discover?${params.toString()}`)
-      setQueues(Array.isArray((response as any).data) ? (response as any).data : [])
+      const response = (await api.get(`/queues/discover?${params.toString()}`)) as unknown
+      const payload =
+        response && typeof response === 'object' && 'data' in response
+          ? (response as { data?: unknown }).data
+          : undefined
+
+      setQueues(Array.isArray(payload) ? (payload as Queue[]) : [])
     } catch (err) {
       console.error('Failed to fetch queues:', err)
       setQueues([])
@@ -96,13 +101,13 @@ export default function DiscoverPage() {
   return (
     <main
       dir={dir}
+      className="app-page"
       style={{
         minHeight: '100vh',
         background: 'linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%)',
-        padding: '100px 20px 40px',
       }}
     >
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <div className="app-container-lg">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
